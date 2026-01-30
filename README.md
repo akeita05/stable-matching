@@ -2,7 +2,7 @@
 
 ## Team Members
 - Person A: Aicha Keita (66149226)
-- Person B: Charlie Stoner
+- Person B: Charlie Stoner (33590548)
 
 ## Project Description
 Implementation of the Gale-Shapley algorithm for the hospital-student stable matching problem. Including a verifier to check validity and stability of matchings.
