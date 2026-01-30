@@ -69,14 +69,67 @@ def write_output(matching, filename):
 		raise Exception(f"Error writing output: {e}")
 
 def gale_shapley(hospital_prefs, student_prefs):
-	#TO DO: full gale-shapley algorithm
 	n = len(hospital_prefs)
-	matching = {}
 
-	for i in range(1, n+1):
-		matching[i] = i
+	#edge case: n = 0
+	if n == 0:
+		return {}, 0
 
-	return matching, 0
+	#hospital_match[h] = student that hospital h is matched to (none if unmatched)
+	hospital_match = {h: None for h in range(1, n+1)}
+
+	#student_match[s] = hospital that student s is matched to (none if unmatched)
+	student_match = {s: None for s in range(1, n+1)}
+
+	#next_proposal[h] = index of next student on hospital h's list to propose to
+	next_proposal = {h: 0 for h in range(1, n+1)}
+
+	#ranking dictionary for effective lookup
+	#student_ranking[s][h] = rank of hospital h in student s's preference list (lower is better)
+	student_ranking = {}
+	for s in range(1, n+1):
+		student_ranking[s] = {}
+		for rank, hospital in enumerate(student_prefs[s-1]):
+			student_ranking[s][hospital] = rank
+
+	#track proposals
+	num_proposals = 0
+
+	#while there is hospitals with students to propose to
+	while True:
+		#find an unmatched hospital
+		free_hospital = None
+		for h in range(1, n+1):
+			if hospital_match[h] is None and next_proposal[h] < n:
+				free_hospital = h
+				break
+
+		#if no unmatched hospitals, we're done
+		if free_hospital is None:
+			break
+
+		#get the next student the hospital should propose to
+		student = hospital_prefs[free_hospital - 1][next_proposal[free_hospital]]
+		next_proposal[free_hospital] += 1
+		num_proposals += 1
+
+		#if student is unmatched, accept
+		if student_match[student] is None:
+			hospital_match[free_hospital] = student
+			student_match[student] = free_hospital
+		else:
+			#if student is matched, compare current match with the new proposer
+			current_hospital = student_match[student]
+
+			#if student prefers the hospital with lower rank in their preference list
+			if student_ranking[student][free_hospital] < student_ranking[student][current_hospital]:
+				#swap matches
+				hospital_match[current_hospital] = None #reject current match
+				hospital_match[free_hospital] = student
+				student_match[student] = free_hospital
+			#else: student prefers current match, reject the new proposer (do nothing)
+
+	return hospital_match, num_proposals
 
 def main():
 	if len(sys.argv) != 3:
