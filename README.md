@@ -15,6 +15,7 @@ stable-matching/
 	src/
 		matcher.py	# Hospital-proposing Gale-Shapley implementation
 		verifier.py	# Validity and stability checker
+		scalability.py # Timing tests and graph generation
 	examples/
 		example.in	# Sample input file
 		example.out
@@ -72,3 +73,24 @@ hospital_id student_id
 - Input files are well-formed
 - Preference lists are complete permutations of 1..n
 - 1-indexed hospital and students
+
+## Running the Verifier
+```bash
+python src/verifier.py <preferences_file> <matching_file>
+```
+
+Example:
+```bash
+python src/verifier.py examples/example.in examples/example.out
+```
+
+Output will be:
+- `VALID STABLE` - if matching is valid and stable
+- `INVALID: <reason>` - if matching is invalid
+- `UNSTABLE: Blocking pair found - Hospital X and Student Y` - if unstable
+
+## Scalability Analysis (Task C)
+
+![Scalability Graph](scalability_results/scalability_graph.png)
+
+Both the matcher and verifier show O(n²) time complexity. The matcher's complexity comes from each hospital potentially proposing to all n students. The verifier checks all n² possible hospital-student pairs for blocking pairs. The trend becomes clearer for larger n values.
